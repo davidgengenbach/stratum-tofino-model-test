@@ -2,7 +2,7 @@ version: "3"
 services:
   tofino_model:
     build: .
-    scale: 10
+    scale: 2
     privileged: true
     tty: true
     stdin_open: true
@@ -13,11 +13,12 @@ services:
     working_dir: /workspace
     entrypoint: ./stratum_tofino_entrypoint.sh
     stop_signal: SIGKILL
-    
     ports:
-      - 28000-28010:28000
-    networks:
-      - stratum
+      # Map ports to host (range)
+      - 28000-28100:28000
+    # TODO: the custom network does not seem to be needed?
+    # networks:
+      #- stratum
 networks:
   stratum:
     driver: bridge
