@@ -1,7 +1,9 @@
+# These images are pre-built as described in https://github.com/stratum/stratum/blob/master/stratum/hal/bin/barefoot/README.run.md#running-stratum-on-tofino-model
 FROM stratumproject/tofino-model:9.3.0 as tofino_model
 
 FROM stratumproject/stratum-bfrt:9.3.0
 
+# The next two statements come from https://github.com/stratum/stratum/blob/master/stratum/hal/bin/barefoot/docker/Dockerfile.model
 ENV BUILD_DEPS \
     iproute2 \
     ethtool \
