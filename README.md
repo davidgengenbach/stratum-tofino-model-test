@@ -6,5 +6,5 @@
 
 ```
 sudo docker-compose -f docker-compose.yaml rm
-sudo docker-compose -f docker-compose.yaml up  --abort-on-container-exit
+sudo docker-compose -f docker-compose.yaml up --force-recreate --abort-on-container-exit
 ```
