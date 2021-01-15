@@ -1,0 +1,23 @@
+version: "3"
+services:
+  tofino_model:
+    build: .
+    scale: 10
+    privileged: true
+    tty: true
+    stdin_open: true
+    environment:
+      - PLATFORM=barefoot-tofino-model
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    entrypoint: ./stratum_tofino_entrypoint.sh
+    stop_signal: SIGKILL
+    
+    ports:
+      - 28000-28010:28000
+    networks:
+      - stratum
+networks:
+  stratum:
+    driver: bridge
