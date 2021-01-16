@@ -3,9 +3,9 @@ services:
   tofino_model:
     build: .
     scale: 2
-    privileged: true
     tty: true
     stdin_open: true
+    privileged: true
     environment:
       - PLATFORM=barefoot-tofino-model
     volumes:

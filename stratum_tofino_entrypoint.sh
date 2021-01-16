@@ -4,8 +4,11 @@ set -eux
 
 # To check: the number of hugepages per switch is 128?
 sysctl -w vm.nr_hugepages=1024
-mkdir /mnt/huge || true
-mount -t hugetlbfs nodev /mnt/huge || true
+
+# TODO: are the following lines needed? Taken from dma_setup.sh
+# mkdir /mnt/huge || true
+# mount -t hugetlbfs nodev /mnt/huge || true
+
 
 # The veths will be created WITHIN the Docker container - not the host system (because of bridged- instead of host-network)
 veth_setup.sh
