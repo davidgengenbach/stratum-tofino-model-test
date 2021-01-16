@@ -25,4 +25,6 @@ sudo ./link_ports.py
 
 Voilá, the first port of the tofino-model switch is linked from within the Docker container into a host "root" namespace veth named `stratumveth000`.
 
+The `stratumvethXXX` interfaces are deleted after you stop the Docker containers.
+
 [This](https://dev.to/polarbit/how-docker-container-networking-works-mimic-it-using-linux-network-namespaces-9mj) is a very nice explanation/guide-through of network namespaces, especially for Docker.

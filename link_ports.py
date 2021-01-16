@@ -3,6 +3,7 @@
 import subprocess
 import typing
 
+
 # TODO: use pyroute2 (https://pypi.org/project/pyroute2/) for some of this?
 
 def get_args():
@@ -25,20 +26,21 @@ def get_args():
 def main():
     args = get_args()
 
-    instances = running_stratum_tofino_models()
+    instances = running_stratum_tofino_models(args.docker_compose_service_name)
     for idx, instance in enumerate(instances):
         link_docker_namespace(instance)
         assert namespace_exists(instance)
+        # TODO: the number of ports could be inferred by looking at the number of veths in the container namespace (before creating veths ourselves, of course)
         for port in range(0, args.ports_per_tofino_model):
             link_tofino_model_port(instance, idx, port)
 
 
 def get_namespaces() -> typing.List[str]:
-    return [x for x in run_cmd(['ls', '/var/run/netns']).splitlines()]
+    return run_cmd(['ls', '/var/run/netns']).splitlines()
 
 
 def namespace_exists(name: str) -> bool:
-    return len([x for x in get_namespaces() if x == name]) == 1
+    return name in get_namespaces()
 
 
 def link_docker_namespace(name: str):
@@ -47,27 +49,27 @@ def link_docker_namespace(name: str):
     run_cmd(['ln', '-s', f'/proc/{pid}/ns/net', f'/var/run/netns/{name}'])
 
 
-def activate_interface(interface: str, namespace: typing.Optional[str] = None):
+def activate_interface(*, interface: str, namespace: typing.Optional[str] = None):
     run_cmd(namespace_cmd(['ip', 'link', 'set', interface, 'up'], namespace=namespace))
 
 
-def move_interface_to_netns(interface: str, namespace: str):
+def move_interface_to_netns(*, interface: str, namespace: str):
     run_cmd(['ip', 'link', 'set', interface, 'netns', namespace])
 
 
-def create_bridge(name: str, namespace: str):
+def create_bridge(*, name: str, namespace: str):
     run_cmd(namespace_cmd(['ip', 'link', 'add', 'name', name, 'type', 'bridge'], namespace=namespace))
 
 
-def add_interface_to_bridge(interface: str, bridge: str, namespace: typing.Optional[str] = None):
+def add_interface_to_bridge(*, interface: str, bridge: str, namespace: str):
     run_cmd(namespace_cmd(['ip', 'link', 'set', interface, 'master', bridge], namespace=namespace))
 
 
-def create_veth(veth0, veth1):
+def create_veth(*, veth0: str, veth1: str):
     run_cmd(['ip', 'link', 'add', veth0, 'type', 'veth', 'peer', 'name', veth1])
 
 
-def link_tofino_model_port(instance, model_index, port):
+def link_tofino_model_port(instance: str, model_index: int, port: int):
     # veth names are "stratumvethXYZ" where
     # X = model index,
     # Y = port, and
@@ -82,28 +84,29 @@ def link_tofino_model_port(instance, model_index, port):
     # The port veth interface name by tofino-model (inside container)
     port_interface = f'veth{port}'
 
-    create_veth(veth0, veth1)
-    activate_interface(veth0)
-    move_interface_to_netns(veth1, instance)
+    create_veth(veth0=veth0, veth1=veth1)
+    activate_interface(interface=veth0)
+    move_interface_to_netns(interface=veth1, namespace=instance)
     # Important: activate AFTER moving into namespace
-    activate_interface(veth1, instance)
+    activate_interface(interface=veth1, namespace=instance)
 
     # Create bridge to connect port veth with our veth1
-    create_bridge(bridge, instance)
-    add_interface_to_bridge(veth1, bridge, namespace=instance)
-    add_interface_to_bridge(port_interface, bridge, namespace=instance)
+    create_bridge(name=bridge, namespace=instance)
+    add_interface_to_bridge(interface=veth1, bridge=bridge, namespace=instance)
+    add_interface_to_bridge(interface=port_interface, bridge=bridge, namespace=instance)
     # Do not forget to activate bridge!
-    activate_interface(bridge, instance)
+    activate_interface(interface=bridge, namespace=instance)
 
 
-def running_stratum_tofino_models(needle='tofino_model') -> typing.List[str]:
-    out = [x.split(' ')[0] for x in run_cmd(['docker-compose', 'ps']).splitlines() if
-           x.count(needle) > 0 and x.count('Exit') == 0]
+def running_stratum_tofino_models(needle: str) -> typing.List[str]:
+    # TODO: is there machine-readable output?
+    out = [x.split(' ')[0] for x in run_cmd(['docker-compose', 'ps']).splitlines()
+           if x.count(needle) > 0 and x.count('Exit') == 0 and x.count('Up') > 0]
     return list(sorted(out))
 
 
 def run_cmd(cmd: typing.List[str], check=True) -> str:
-    print(' '.join(cmd))
+    print('Executing:', ' '.join(cmd))
     return subprocess.run(cmd, stdout=subprocess.PIPE, check=check).stdout.decode('utf-8')
 
 
@@ -111,10 +114,6 @@ def namespace_cmd(cmd: typing.List[str], namespace: typing.Optional[str] = None)
     if namespace:
         cmd = ['ip', 'netns', 'exec', namespace] + cmd
     return cmd
-
-
-def interfaces(namespace: typing.Optional[str] = None) -> typing.List[str]:
-    return [x.strip() for x in run_cmd(namespace_cmd(['ip', 'link'], namespace=namespace)).splitlines()]
 
 
 if __name__ == '__main__':
