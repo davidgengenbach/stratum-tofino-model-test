@@ -2,3 +2,5 @@
 bf_drivers.log.*
 zlog-cfg-cur
 pcap_output/
+venv/
+.idea/
