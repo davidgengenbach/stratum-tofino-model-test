@@ -5,8 +5,8 @@
 ## Instructions
 
 ```
-sudo docker-compose -f docker-compose.yaml rm
-sudo docker-compose -f docker-compose.yaml up --force-recreate --abort-on-container-exit
+sudo docker-compose rm
+sudo docker-compose up --force-recreate --abort-on-container-exit
 ```
 
 ## Linking tofino-model veth ports to host
