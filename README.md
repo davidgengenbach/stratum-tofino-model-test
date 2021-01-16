@@ -20,7 +20,7 @@ This is only a rough sketch on how to achive it:
 Now, the `stratumveth000` in the root namespace is connected with `veth0` inside the first tofino-model container!
 
 ```
-sudo ./link_ports.py
+sudo ./link_ports.py --verbose
 ```
 
 Voilá, the first port of the tofino-model switch is linked from within the Docker container into a host "root" namespace veth named `stratumveth000`.
