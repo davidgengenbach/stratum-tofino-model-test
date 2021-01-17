@@ -6,7 +6,7 @@
 
 ```
 sudo docker-compose rm
-sudo docker-compose up --force-recreate --abort-on-container-exit
+sudo docker-compose up --force-recreate --abort-on-container-exit --scale tofino_model=2
 ```
 
 ## Linking tofino-model veth ports to host

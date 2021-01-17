@@ -4,3 +4,4 @@ zlog-cfg-cur
 pcap_output/
 venv/
 .idea/
+__pycache__/
