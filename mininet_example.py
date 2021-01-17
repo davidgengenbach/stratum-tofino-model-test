@@ -43,6 +43,8 @@ class CerebroTopo(Topo):
         switch2 = self.addSwitch('s2')
         self.addLink(switch2, host3)
 
+        self.addLink(switch1, switch2)
+
 
 if __name__ == '__main__':
     main()

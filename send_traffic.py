@@ -22,7 +22,7 @@ def main():
     logger.setLevel(logging.DEBUG)
     logger.info('Arguments', args)
     try:
-        packet = Ether()/ARP(hwsrc="00:00:00:00:00", pdst="10.0.0.2")
+        packet = Ether()/ARP(hwsrc="00:00:00:00:00", pdst="10.0.1.200")
         sendp(packet, iface=args.interface, loop=1, inter=0.1)
     except KeyboardInterrupt:
         pass
