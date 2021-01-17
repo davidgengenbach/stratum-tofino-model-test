@@ -5,7 +5,8 @@
 ## Instructions
 
 ```
-sudo docker-compose rm
+sudo docker-compose rm --force
+#  --build
 sudo docker-compose up --force-recreate --abort-on-container-exit --scale tofino_model=2
 ```
 

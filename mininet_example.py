@@ -33,15 +33,15 @@ class CerebroTopo(Topo):
         Topo.__init__(self, **opts)
 
     def build(self, *args, **params):
-        last_switch = None
-        for i in range(self.num_hosts):
-            host_index = str(i + 1)
-            host = self.addHost('h' + host_index, ip="10.0.0." + host_index, cls=NoOffloadHost)
-            worker_switch = self.addSwitch('s' + host_index)
-            self.addLink(host, worker_switch, autoconf=True)
-            if last_switch is not None:
-                self.addLink(worker_switch, last_switch, autoconf=True)
-            last_switch = worker_switch
+        switch1 = self.addSwitch('s1')
+        host1 = self.addHost(f'h1', ip=f"10.0.0.1")
+        host2 = self.addHost(f'h2', ip=f"10.0.0.2")
+        self.addLink(switch1, host1)
+        self.addLink(switch1, host2)
+
+        host3 = self.addHost(f'h3', ip=f"10.0.0.3")
+        switch2 = self.addSwitch('s2')
+        self.addLink(switch2, host3)
 
 
 if __name__ == '__main__':

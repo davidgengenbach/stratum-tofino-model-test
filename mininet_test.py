@@ -26,6 +26,7 @@ class StratumTofinoModel(Switch):
             bridge = f'stratumbr{self.instance_index}{port}'
             stratum_intf = f'stratumveth{self.instance_index}{port}0'
             for cmd in [
+                f'ip link delete {bridge}',
                 f'ip link add name {bridge} type bridge',
                 f'ip link set {stratum_intf} master {bridge}',
                 f'ip link set {intf} master {bridge}',
