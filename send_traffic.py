@@ -2,9 +2,9 @@
 
 import logging
 
-from scapy.layers.inet import TCP, IP
+from scapy.layers.inet import IP, UDP
 from scapy.layers.l2 import Ether, ARP
-from scapy.sendrecv import sendp
+from scapy.sendrecv import send, sendp
 
 
 def main():
@@ -22,8 +22,10 @@ def main():
     logger.setLevel(logging.DEBUG)
     logger.info('Arguments', args)
     try:
-        packet = Ether()/ARP(hwsrc="00:00:00:00:00", pdst="10.0.1.200")
-        sendp(packet, iface=args.interface, loop=1, inter=0.1)
+        #packet = Ether() / ARP(op="who-has", pdst="10.0.0.2")
+        packet = Ether() / IP() / "Test"
+        # packet = IP(dst="10.0.0.2") / UDP() / "YEAHYEAH"
+        sendp(packet, iface=args.interface, loop=1, inter=0.5)
     except KeyboardInterrupt:
         pass
 

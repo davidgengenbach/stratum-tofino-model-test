@@ -17,8 +17,8 @@ services:
       # Map ports to host (range)
       - 28000-28100:28000
     # TODO: the custom network does not seem to be needed?
-    networks:
-      - stratum
+    #networks:
+    #  - stratum
 networks:
   stratum:
     driver: bridge
